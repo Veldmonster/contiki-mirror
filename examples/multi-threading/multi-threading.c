@@ -46,6 +46,7 @@
  * in a way that is incompatible with fibers. Therefore most Cygwin
  * C-library functions don't work when called from a Contiki thread. */
 
+#include <stdio.h>
 #include "contiki.h"
 #include "sys/mt.h"
 

@@ -1,4 +1,4 @@
-CONTIKI_PROJECT = multi-threading
+CONTIKI_PROJECT = multi-threading.elf
 all: $(CONTIKI_PROJECT)
 
 CONTIKI = ../..

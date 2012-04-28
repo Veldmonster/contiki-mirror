@@ -1,0 +1,51 @@
+### Check if we are running under Windows
+ifndef WINDIR
+  ifdef OS
+    ifneq (,$(findstring Windows,$(OS)))
+      WINDIR := Windows
+    endif
+  endif
+endif
+
+.SUFFIXES:
+
+### Optimization setting. $make OPTI=0 for easier debugging of changed source file(s)
+ifndef OPTI
+  OPTI=0
+endif
+
+### These directories will be searched for the specified source files
+CONTIKI_CPU_DIRS = . dev
+
+### Stellarisware includes start
+### Download and extract Stellarisware from Texas Instruments. 
+### Current build (2012/01/22) uses Stellarisware version SW-LM3S-8264.
+### Stellarisware paths MUST NOT contain spaces or special characters.
+STELLARISWARE_ROOT=C:/Stellarisware
+STELLARISWARE_DRIVERS += camera.c extflash.c extram.c jpgwidget.c \
+							kitronix320x240x16_fpga.c kitronix320x240x16_ssd2119_8bit.c \
+							set_pinout.c sound.c ssiflash.c thumbwheel.c tlv320aic23b.c \
+							touch.c usb_sound.c vidwidget.c wavfile.c								
+CONTIKIDIRS += $(STELLARISWARE_ROOT)/boards/dk-lm3s9b96
+CONTIKIDIRS += $(STELLARISWARE_ROOT)/boards/dk-lm3s9b96/drivers
+CONTIKI_SOURCEFILES += $(CONTIKI_TARGET_SOURCEFILES)
+### Stellarisware includes end
+
+### To use CodeSourcery Personal for Stallaris (paid version), 
+### it must be included int the build command ex:
+### cs-make all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3					
+ifeq ($(TOOLCHAIN),cs3)
+${info Using CS3}
+CONTIKI_PLAT_DEFS += -Dsourcerygxx
+include $(CONTIKI_CPU)/mf-cs3.mk
+else ifeq ($(TOOLCHAIN),gcc)
+${info Using GCC}
+CONTIKI_PLAT_DEFS += -Dgcc
+include $(CONTIKI_CPU)/mf-gcc.mk
+else
+${info ERROR: please use the following commands}
+${info build command: cs-make all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3 OR TOOLCHAIN=gcc}
+${info clean command: cs-make clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3 OR TOOLCHAIN=gcc}
+endif
+
+
