@@ -44,7 +44,7 @@
 
 #include "contiki.h"
 
-void loadUserRegs(uint8_t * mac_address);
-void loadRadioMACAddress(uint8_t * mac_address);
+void load_user_regs(uint8_t * mac_address);
+void load_radio_mac_address(uint8_t * mac_address);
 
 #endif /* MEMORY_NV_H_ */

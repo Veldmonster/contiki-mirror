@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Universal Concepts CC, South Africa
+ * Copyright (c) 2007, Swedish Institute of Computer Science
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,32 +27,34 @@
  * SUCH DAMAGE.
  *
  * This file is part of the Contiki operating system.
- * This port targets the Stellaris ARM, Cortex M3, LM3S9xxxx
- * which is based on siskin's, multiple-netif branch
- * for the AVR Zigbit and Microchips ENC28J60.
- * @(#)$
+ *
  */
 
-/*
- *  Filename: contiki-arm-dk-lm3s9b96.h
- *  Created on: 06 Jan 2012
- *  Author: Anton Veldhuizen
+/**
+ * \file
+ *	Architecture-specific definitions for the SHT11 sensor on Tmote Sky.
+ * \author
+ * 	Niclas Finne <nfi@sics.se>
  */
 
-#ifndef __CONTIKI_ARM_DK-LM3S9B96_H__
-#define __CONTIKI_ARM_DK-LM3S9B96_H__
+#ifndef SHT11_ARCH_H
+#define SHT11_ARCH_H
 
-#include "contiki.h"
-#include "contiki-net.h"
-#include "contiki-lib.h"
+#define SHT11_ARCH_SDA	5	/* P1.5 */
+#define SHT11_ARCH_SCL	6	/* P1.6 */
+#define SHT11_ARCH_PWR	7	/* P1.7 */
 
-#include "dev/rs232.h"
+// TODO: Anton
+//#define	SHT11_PxDIR	P1DIR
+//#define SHT11_PxIN	P1IN
+//#define SHT11_PxOUT	P1OUT
+//#define SHT11_PxSEL	P1SEL
 
-#include "dev/serial-line.h"
-#include "dev/slip.h"
+#define	SHT11_PxDIR	1
+#define SHT11_PxIN	1
+#define SHT11_PxOUT	1
+#define SHT11_PxSEL	1
 
-void init_lowlevel(void);
-void init_net(void);
 
 
-#endif /* #ifndef __CONTIKI_ARM_DK-LM3S9B96_H__ */
+#endif

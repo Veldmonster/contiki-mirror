@@ -220,9 +220,6 @@ typedef enum {
 PROCESS(rf230_process, "RF230 driver");
 /*---------------------------------------------------------------------------*/
 
-int rf230_on(void);
-int rf230_off(void);
-
 static int rf230_read(void *buf, unsigned short bufsize);
 
 static int rf230_prepare(const void *data, unsigned short len);

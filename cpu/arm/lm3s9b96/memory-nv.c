@@ -46,7 +46,7 @@
 #include "lm3s9b96def.h"
 
 void
-loadUserRegs(uint8_t *mac_address)
+load_user_regs(uint8_t *mac_address)
 {
 	unsigned long userReg0 = 0xffffffff;
 	unsigned long userReg1 = 0xffffffff;
@@ -64,7 +64,7 @@ loadUserRegs(uint8_t *mac_address)
 }
 
 void
-loadRadioMACAddress(uint8_t *mac_address)
+load_radio_mac_address(uint8_t *mac_address)
 {
 	// TODO: Anton - Convert ethernet address or read from flash?
 	mac_address[0] = 0x99;

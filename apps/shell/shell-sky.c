@@ -45,7 +45,25 @@
 
 #include "net/rime.h"
 #include "net/netstack.h"
+
+#ifndef RF230BB
 #include "dev/cc2420.h"
+#define RADIO_ON cc2420_on
+#define RADIO_RSSI cc2420_rssi
+#define RADIO_GET_TXPOWER cc2420_get_txpower
+#define RADIO_SET_TXPOWER cc2420_set_txpower
+#define RADIO_GET_CHANNEL cc2420_get_channel
+#define RADIO_SET_CHANNEL cc2420_set_channel
+#else
+#include "radio/rf230bb/rf230bb.h"
+#define RADIO_ON rf230_on
+#define RADIO_RSSI rf230_rssi
+#define RADIO_GET_TXPOWER rf230_get_txpower
+#define RADIO_SET_TXPOWER rf230_set_txpower
+#define RADIO_GET_CHANNEL rf230_get_channel
+#define RADIO_SET_CHANNEL rf230_set_channel
+#endif
+
 #include "dev/leds.h"
 #include "dev/sht11.h"
 #include "dev/light-sensor.h"
@@ -100,10 +118,10 @@ do_rssi(void)
   
   NETSTACK_MAC.off(0);
 
-  cc2420_on();
+  RADIO_ON();
   for(channel = 11; channel <= 26; ++channel) {
-    cc2420_set_channel(channel);
-    rssi_samples[sample].channel[channel - 11] = cc2420_rssi() + 53;
+    RADIO_SET_CHANNEL(channel);
+    rssi_samples[sample].channel[channel - 11] = RADIO_RSSI() + 53;
   }
   
   NETSTACK_MAC.on();
@@ -117,7 +135,7 @@ do_rssi(void)
       int max = -256;
       int i;
       for(i = 0; i < NUM_SAMPLES; ++i) {
-	max = MAX(max, rssi_samples[i].channel[channel]);
+      	max = MAX(max, rssi_samples[i].channel[channel]);
       }
       tot += max / 20;
     }
@@ -225,9 +243,9 @@ PROCESS_THREAD(shell_txpower_process, ev, data)
      out the current txpower. */
   
   if(newptr == data) {
-    msg.txpower = cc2420_get_txpower();
+    msg.txpower = RADIO_GET_TXPOWER();
   } else {
-    cc2420_set_txpower(msg.txpower);
+    RADIO_SET_TXPOWER(msg.txpower);
   }
 
   msg.len = 1;
@@ -251,9 +269,9 @@ PROCESS_THREAD(shell_rfchannel_process, ev, data)
   /* If no channel was given on the command line, we print out the
      current channel. */
   if(newptr == data) {
-    msg.channel = cc2420_get_channel();
+    msg.channel = RADIO_GET_CHANNEL();
   } else {
-    cc2420_set_channel(msg.channel);
+    RADIO_SET_CHANNEL(msg.channel);
   }
 
   msg.len = 1;
@@ -301,6 +319,5 @@ shell_sky_init(void)
   shell_register_command(&sense_command);
   shell_register_command(&senseconv_command);
   shell_register_command(&nodeid_command);
-
 }
 /*---------------------------------------------------------------------------*/

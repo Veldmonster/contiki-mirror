@@ -1,25 +1,15 @@
-# Contiki port for Stellaris DK-LM3S9B96
-# Developed using CodeSourcery Personal Edition for Stellaris on Windows7, 64Bit
+# $Id: Makefile.dk-lm3s9b96,v 1.38 2010/05/03 13:51:11 nifi Exp $
 
-CONTIKI_TARGET_DIRS = . apps net loader
-CONTIKI_CORE=contiki-dk-lm3s9b96
-CONTIKI_TARGET_MAIN = ${CONTIKI_CORE}.o
+#CONTIKI_TARGET_SOURCEFILES += contiki-dk-lm3s9b96-platform.c \
+#	sht11.c sht11-sensor.c light-sensor.c battery-sensor.c \
+#	button-sensor.c radio-sensor.c
 
-CONTIKI_TARGET_SOURCEFILES += rs232.c cfs-eeprom.c eeprom.c random.c \
-								mmem.c contiki-arm-dk-lm3s9b96-main.c
+CONTIKI_TARGET_SOURCEFILES += contiki-dk-lm3s9b96-platform.c \
+	light-sensor.c battery-sensor.c button-sensor.c radio-sensor.c
 
-### Define the CPU directory of the Cortex-M3 port
-CONTIKI_CPU=$(CONTIKI)/cpu/arm/lm3s9b96
-CONTIKIBOARD=.
+#ifndef SMALL
+#SMALL=1
+#endif
 
-CONTIKI_PLAT_DEFS = -DAUTO_CRC_PADDING=2 \
-					-DTARGET_IS_TEMPEST_RB1 \
-					-DF_CPU=50000000UL \
-					-DPART_LM3S9B96 \
-					-DUSE_STELLARISWARE_FROM_ROM
+include $(CONTIKI)/platform/dk-lm3s9b96/Makefile.common
 
-MCU=lm3s9b96
-
-include $(CONTIKI_CPU)/Makefile.lm3s9b96
-include $(CONTIKI_CPU)/radio/Makefile.radio
-include $(CONTIKI_CPU)/ethernet/Makefile.ethernet

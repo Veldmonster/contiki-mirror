@@ -55,3 +55,7 @@ endif
 ifeq ($(TARGET),z1)
   shell_src += shell-sky.c shell-exec.c shell-sensortweet.c
 endif
+
+ifeq ($(TARGET),dk-lm3s9b96)
+  shell_src += shell-sky.c shell-exec.c shell-sensortweet.c
+endif

@@ -185,7 +185,7 @@ PROCESS_THREAD(shell_sendtest_process, ev, data)
 	  CLOCK_SECOND * filesize / (end_time_rucb - start_time_rucb));
   shell_output_str(&sendtest_command, "Completed in ", buf);
 
-  sprintf(buf, "%lu/%d rx %lu/%d tx (seconds)",
+  sprintf(buf, "%lu/%lu rx %lu/%lu tx (seconds)",
 	  (rx2 - rx), RTIMER_ARCH_SECOND,
 	  (tx2 - tx), RTIMER_ARCH_SECOND);
   shell_output_str(&sendtest_command, "Radio total on time ", buf);

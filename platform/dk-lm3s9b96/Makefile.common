@@ -1,0 +1,26 @@
+# Contiki port for Stellaris DK-LM3S9B96
+# Developed using CodeSourcery Personal Edition for Stellaris on Windows7, 64Bit
+
+CONTIKI_TARGET_DIRS = . dev apps net
+ifndef CONTIKI_TARGET_MAIN
+CONTIKI_TARGET_MAIN = contiki-dk-lm3s9b96-main.c
+endif
+
+CONTIKI_TARGET_SOURCEFILES += rs232.c cfs-eeprom.c eeprom.c random.c node-id.c \
+								sensors.c sky-sensors.c uip-ipchksum.c mmem.c \
+								sht11.c sht11-sensor.c
+
+### Define the CPU directory of the Cortex-M3 port
+CONTIKI_CPU=$(CONTIKI)/cpu/arm/lm3s9b96
+CONTIKIBOARD=.
+
+CONTIKI_PLAT_DEFS = -DAUTO_CRC_PADDING=2 \
+					-DTARGET_IS_TEMPEST_RB1 \
+					-DPART_LM3S9B96 \
+					-DUSE_STELLARISWARE_FROM_ROM
+
+MCU=lm3s9b96
+
+include $(CONTIKI_CPU)/Makefile.lm3s9b96
+include $(CONTIKI_CPU)/radio/Makefile.radio
+include $(CONTIKI_CPU)/ethernet/Makefile.ethernet

@@ -2,14 +2,18 @@
 ### CodeSourcery Personal for Stellaris (paid version)
 LM3S9B96 += syscalls_cs3.c \
 			clock.c delay.c eeprom.c flash.c rs232.c \
-			leds-arch.c watchdog.c memory-nv.c mtarch.c rtimer-arch.c
+			leds-arch.c watchdog.c memory-nv.c mtarch.c rtimer-arch.c uip-ipchksum.c
 ### TARGETLIBS are platform-specific routines in the contiki library path
 TARGETLIBS = random.c leds.c
+UIPDRIVERS = me.c me_tabs.c slip.c crc16.c
 CONTIKI_TARGET_SOURCEFILES += $(LM3S9B96) $(SENSORS) \
 								$(SYSAPPS) \
 								$(TARGETLIBS) \
+								$(UIPDRIVERS) \
 								$(STELLARISWARE_DRIVERS)
 CONTIKI_SOURCEFILES += $(CONTIKI_TARGET_SOURCEFILES)
+			
+PROJECT_OBJECTFILES += ${addprefix $(OBJECTDIR)/,$(CONTIKI_TARGET_MAIN:.c=.o)}
 
 ### Compiler definitions
 CC       = arm-stellaris-eabi-gcc
@@ -23,7 +27,6 @@ SIZE	 = arm-stellaris-eabi-size
 
 ARCH_FLAGS= -mcpu=cortex-m3 -mthumb
 
-# -std=gnu89 is avr libc default.  I am trying to do the same thing on arm.
 CFLAGSNO = -I. \
 			-I$(CONTIKI)/core \
 			-I$(CONTIKI)/platform/$(TARGET) \
@@ -42,7 +45,9 @@ CFLAGS += 	-fno-strict-aliasing \
 			-Wno-uninitialized \
 			-Wno-unused-variable \
 			-Wno-unused-but-set-variable \
-			-Wno-unused-function
+			-Wno-char-subscripts \
+			-Wno-unused-function \
+			-Wno-pointer-sign
 
 LDFLAGS +=  $(ARCH_FLAGS) -lm \
 			-Wl,--gc-sections -Xlinker -Map=contiki-$(TARGET).map \
@@ -65,12 +70,20 @@ $(OBJECTDIR)/%.o: %.c
 #	$(STRIP) -K _init -K _fini --strip-unneeded -g -x $< -o $@
 
 CUSTOM_RULE_LINK=yes
-%.elf:	%.co $(PROJECT_OBJECTFILES) contiki-$(TARGET).a syscalls_cs3.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter-out %.a,$^) $(filter %.a,$^) $(LDLIBS)
+%.elf: %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a syscalls_cs3.o
+	$(CC) $(CFLAGS) $(LDFLAGS) ${filter-out %.a,$^} ${filter %.a,$^} $(LDLIBS) -o $@
 #Allow top-level makefile to always show size even when build is up to date
 ifndef NOMAKEFILESIZE
 	$(SIZE) -A $@
 endif
+
+#CUSTOM_RULE_LINK=yes
+#%.elf:	%.co $(PROJECT_OBJECTFILES) contiki-$(TARGET).a syscalls_cs3.o
+#	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter-out %.a,$^) $(filter %.a,$^) $(LDLIBS)
+#Allow top-level makefile to always show size even when build is up to date
+#ifndef NOMAKEFILESIZE
+#	$(SIZE) -A $@
+#endif
 
 %.bin: %.elf
 	$(OBJCOPY) $^ $@ -O binary

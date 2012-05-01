@@ -24,7 +24,7 @@
 							<option id="com.codesourcery.arm_stellaris_eabi.exe.debug.general.hosting.1438365596" name="Hosting" superClass="com.codesourcery.arm_stellaris_eabi.exe.debug.general.hosting"/>
 							<option id="com.codesourcery.arm_stellaris_eabi.exe.debug.general.cpu.919583101" name="Processor" superClass="com.codesourcery.arm_stellaris_eabi.exe.debug.general.cpu"/>
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.platform.exe.debug.716090262" name="Debug Platform" superClass="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/contiki-mirror/examples/multi-threading}" cleanBuildTarget="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" id="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.builder.exe.debug.1669885883" incrementalBuildTarget="all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/contiki-mirror/examples/sky-ip}" cleanBuildTarget="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" id="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.builder.exe.debug.1669885883" incrementalBuildTarget="all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.target.gnu.builder.exe.debug"/>
 							<tool id="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.tool.gnu.c.compiler.exe.debug.190894416" name="Sourcery CodeBench C Compiler" superClass="com.codesourcery.arm_stellaris_eabi.cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 								<inputType id="com.codesourcery.arm_stellaris_eabi.cdt.debug.core.c.compiler.exe.debug.input.1164744071" superClass="com.codesourcery.arm_stellaris_eabi.cdt.debug.core.c.compiler.exe.debug.input"/>
 							</tool>
@@ -72,8 +72,25 @@
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
+			<target name="clean TARGET=avr-atmega128rfa1" path="examples/webserver" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=avr-atmega128rfa1" path="examples/webserver" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
 			<target name="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/multi-threading" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -81,6 +98,7 @@
 			</target>
 			<target name="all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/multi-threading" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -88,7 +106,6 @@
 			</target>
 			<target name="clean TARGET=avr-atmega128rfa1" path="examples/webserver-ipv6-raven" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -96,7 +113,6 @@
 			</target>
 			<target name="all TARGET=avr-atmega128rfa1" path="examples/webserver-ipv6-raven" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -104,7 +120,6 @@
 			</target>
 			<target name="clean TARGET=avr-atmega128rfa1" path="examples/webserver-ipv6" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -112,8 +127,63 @@
 			</target>
 			<target name="all TARGET=avr-atmega128rfa1" path="examples/webserver-ipv6" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean TARGET=avr-atmega128rfa1" path="examples/sky-shell-webserver" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=avr-atmega128rfa1" path="examples/sky-shell-webserver" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
 				<buildArguments/>
 				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean TARGET=avr-atmega128rfa1" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=avr-atmega128rfa1" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="test TARGET=HEllo" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>test TARGET=HEllo</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
