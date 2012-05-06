@@ -55,15 +55,9 @@
 #include "memory-nv.h"
 #include "dev/watchdog.h"
 #include "dev/delay.h"
-//#include "dev/cc2420.h"
-//#include "dev/ds2411.h"
 #include "dev/leds.h"
 #include "dev/rs232.h"
-//#include "dev/serial-line.h"
-#include "dev/slip.h"
-//#include "dev/uart1.h"
-//#include "dev/watchdog.h"
-//#include "dev/xmem.h"
+#include "ethernet/ethernet-drv.h"
 #include "lib/random.h"
 #include "radio/rf230bb/rf230bb.h"
 #include "net/netstack.h"
@@ -108,10 +102,10 @@ static struct timer mgt_timer;
 #include "net/uip-fw.h"
 #include "net/uip-fw-drv.h"
 #include "net/uip-over-mesh.h"
-static struct uip_fw_netif slipif =
-  {UIP_FW_NETIF(192,168,1,2, 255,255,255,255, slip_send)};
+static struct uip_fw_netif ethif =
+  {UIP_FW_NETIF(192,168,0,210, 255,255,255,255, ethernet_output)};
 static struct uip_fw_netif meshif =
-  {UIP_FW_NETIF(172,16,0,0, 255,255,0,0, uip_over_mesh_send)};
+  {UIP_FW_NETIF(192,168,0,211, 255,255,0,0, uip_over_mesh_send)};
 
 #endif /* WITH_UIP */
 
@@ -250,6 +244,9 @@ main(void)
   /* Initialize and set stdout */
   rs232_redirect_stdout(RS232_PORT_0);
 
+  /* Initialize ethernet (replaces slip) */
+  ethernet_init();
+
   /* rtimers needed for radio cycling */
   rtimer_init();
   
@@ -373,10 +370,10 @@ main(void)
          RF_CHANNEL);
 #endif /* WITH_UIP6 */
 
-#if !WITH_UIP && !WITH_UIP6
-  uart1_set_input(serial_line_input_byte);
-  serial_line_init();
-#endif
+//#if !WITH_UIP && !WITH_UIP6
+//  uart1_set_input(serial_line_input_byte);
+//  serial_line_init();
+//#endif
 
 #if PROFILE_CONF_ON
   profile_init();
@@ -392,25 +389,28 @@ main(void)
 #if WITH_UIP
   process_start(&tcpip_process, NULL);
   process_start(&uip_fw_process, NULL);	/* Start IP output */
-  process_start(&slip_process, NULL);
+  process_start(&ethernet_process, NULL);
 
-  slip_set_input_callback(set_gateway);
+  ethernet_set_input_callback(set_gateway);
 
   {
     uip_ipaddr_t hostaddr, netmask;
 
     uip_init();
 
-    uip_ipaddr(&hostaddr, 172,16,
-	       rimeaddr_node_addr.u8[0],rimeaddr_node_addr.u8[1]);
+    // TODO: Anton - code seems wrong
+    //uip_ipaddr(&hostaddr, 172,16,
+	  //     rimeaddr_node_addr.u8[0],rimeaddr_node_addr.u8[1]);
+    uip_ipaddr(&hostaddr, 192,168,
+	       rimeaddr_node_addr.u8[1],rimeaddr_node_addr.u8[0]);
     uip_ipaddr(&netmask, 255,255,0,0);
     uip_ipaddr_copy(&meshif.ipaddr, &hostaddr);
 
     uip_sethostaddr(&hostaddr);
     uip_setnetmask(&netmask);
     uip_over_mesh_set_net(&hostaddr, &netmask);
-    /*    uip_fw_register(&slipif);*/
-    uip_over_mesh_set_gateway_netif(&slipif);
+    /*    uip_fw_register(&ethif);*/
+    uip_over_mesh_set_gateway_netif(&ethif);
     uip_fw_default(&meshif);
     uip_over_mesh_init(UIP_OVER_MESH_CHANNEL);
     printf("uIP started with IP address %d.%d.%d.%d\n",
@@ -455,18 +455,19 @@ main(void)
 //    int s = splhigh();		/* Disable interrupts. */
     /* uart1_active is for avoiding LPM3 when still sending or receiving */
 //    if(process_nevents() != 0 || uart1_active()) {
-		if(process_nevents() != 0) {
+		if(process_nevents() != 0 || ethernet_active()) {
 // TODO: Anton
 //      splx(s);			/* Re-enable interrupts. */
-    } else {
+    }
+		else {
       static unsigned long irq_energest = 0;
 
 #if DCOSYNCH_CONF_ENABLED
       /* before going down to sleep possibly do some management */
       if(timer_expired(&mgt_timer)) {
         watchdog_periodic();
-	timer_reset(&mgt_timer);
-	msp430_sync_dco();
+				timer_reset(&mgt_timer);
+				msp430_sync_dco();
 #if CC2420_CONF_SFD_TIMESTAMPS
         cc2420_arch_sfd_init();
 #endif /* CC2420_CONF_SFD_TIMESTAMPS */

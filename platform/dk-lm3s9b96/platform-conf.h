@@ -65,7 +65,9 @@
 #define BAUD2UBR(baud) ((F_CPU/baud))
 */
 
+/* TODO: Anton - replace with ethernet
 #define SLIP_PORT RS232_PORT_1
+*/
 
 #define CCIF
 #define CLIF

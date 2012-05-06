@@ -196,7 +196,7 @@ rs232_set_input(uint8_t port, int (*f)(unsigned char))
 void
 slip_arch_writeb(unsigned char c)
 {
-  rs232_send(SLIP_PORT, c);
+//  rs232_send(SLIP_PORT, c);
 }
 
 /*---------------------------------------------------------------------------*/

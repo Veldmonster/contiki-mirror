@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2011, Universal Concepts CC, South Africa
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,53 +27,68 @@
  * SUCH DAMAGE.
  *
  * This file is part of the Contiki operating system.
- *
- * $Id: uip-ipchksum.c,v 1.4 2007/04/04 11:53:07 bg- Exp $
+ * This port targets the Stellaris ARM, Cortex M3, LM3S9xxxx
+ * which is based on siskin's, multiple-netif branch
+ * for the AVR Zigbit and Microchips ETHERNET.
+ * @(#)$
  */
 
-/**
- * \file
- *         uIP checksum calculation for MSP430
+/*
+ *  Filename: uip-ipchksum.c
+ *  Created on: 05 May 2012
+ *  Author: Anton Veldhuizen
  */
 
 #include "net/uip.h"
 
-//#define asmv(arg) __asm__ __volatile__(arg)
-/*---------------------------------------------------------------------------*/
 #ifdef UIP_ARCH_IPCHKSUM
-// TODO: Anton
-//#ifdef __IAR_SYSTEMS_ICC__
+/*---------------------------------------------------------------------------*/
+uint16_t
+htons(uint16_t val)
+{
+  return UIP_HTONS(val);
+}
+
+/*---------------------------------------------------------------------------*/
+static uint16_t
+chksum(uint16_t sum, const uint8_t *data, uint16_t len)
+{
+  uint16_t t;
+  const uint8_t *dataptr;
+  const uint8_t *last_byte;
+
+  dataptr = data;
+  last_byte = data + len - 1;
+
+  while(dataptr < last_byte) {	/* At least two more bytes */
+    t = (dataptr[0] << 8) + dataptr[1];
+    sum += t;
+    if(sum < t) {
+      sum++;		/* carry */
+    }
+    dataptr += 2;
+  }
+
+  if(dataptr == last_byte) {
+    t = (dataptr[0] << 8) + 0;
+    sum += t;
+    if(sum < t) {
+      sum++;		/* carry */
+    }
+  }
+
+  /* Return sum in host byte order. */
+  return sum;
+}
+/*---------------------------------------------------------------------------*/
+
 uint16_t
 uip_ipchksum(void)
 {
-  return 0;
+  uint16_t sum;
+
+  sum = chksum(0, &uip_buf[UIP_LLH_LEN], UIP_IPH_LEN);
+  return (sum == 0) ? 0xffff : htons(sum);
 }
-// TODO: Anton
-//#else
-//uint16_t
-//uip_ipchksum(void)
-//{
-//  /* Assumes proper alignement of uip_buf. */
-//  uint16_t *p = (uint16_t *)&uip_buf[UIP_LLH_LEN];
-//  register uint16_t sum;
-//
-//  sum = p[0];
-//  asmv("add  %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[1]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[2]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[3]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[4]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[5]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[6]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[7]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[8]));
-//  asmv("addc %[p], %[sum]": [sum] "+r" (sum): [p] "m" (p[9]));
-//
-//  /* Finally, add the remaining carry bit. */
-//  asmv("addc #0, %[sum]": [sum] "+r" (sum));
-//
-//  /* Return sum in network byte order. */
-//  return (sum == 0) ? 0xffff : sum;
-//}
-//#endif
-#endif
 /*---------------------------------------------------------------------------*/
+#endif

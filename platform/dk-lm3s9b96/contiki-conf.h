@@ -179,13 +179,13 @@
 #endif /* SICSLOWPAN_CONF_MAX_MAC_TRANSMISSIONS */
 #else /* WITH_UIP6 */
 #define UIP_CONF_IP_FORWARD      1
-#define UIP_CONF_BUFFER_SIZE     108
+#define UIP_CONF_BUFFER_SIZE		 1300
 #endif /* WITH_UIP6 */
 
 #define UIP_CONF_ICMP_DEST_UNREACH 1
 
 #define UIP_CONF_DHCP_LIGHT
-#define UIP_CONF_LLH_LEN         0
+#define UIP_CONF_LLH_LEN         14
 #ifndef  UIP_CONF_RECEIVE_WINDOW
 #define UIP_CONF_RECEIVE_WINDOW  48
 #endif

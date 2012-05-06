@@ -48,27 +48,20 @@
 #include "ethernet/ethernet-drv.h"
 #include "contiki-net.h"
 #include "net/uip-neighbor.h"
+#include "net/uip.h"
+#include "net/uip-fw.h"
+#include "net/uip_arp.h"
 
 #define DEBUG 0
 #include "net/uip-debug.h"
 
-//#define ETHERNET_INTERFACE_ID IF_FALLBACK
-#define ETHERNET_INTERFACE_ID 0
-
-#if UIP_CONF_LLH_LEN == 0
-#define ETHERNET_LLH_LEN 14
-uint8_t ll_header[ETHERNET_LLH_LEN];
-#define BUF ((struct uip_eth_hdr *)&ll_header[0])
-#else
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
-#endif
-
-#define IPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 PROCESS(ethernet_process, "ETHERNET driver");
 
-uint8_t eth_mac_addr[6];
+struct uip_eth_addr eth_mac_addr;
 static void (* input_callback)(void) = NULL;
+
 /*---------------------------------------------------------------------------*/
 void
 ethernet_set_input_callback(void (*c)(void))
@@ -78,23 +71,16 @@ ethernet_set_input_callback(void (*c)(void))
 
 /*---------------------------------------------------------------------------*/
 uint8_t
-ethernet_output(uip_lladdr_t *lladdr)
+ethernet_active(void)
+{
+	return !MAP_EthernetSpaceAvail(ETH_BASE);
+}
+
+uint8_t
+ethernet_output(void)
 {
 	PRINTF("ETHERNET send: %d bytes\n",uip_len);
-	if (lladdr == NULL) {
-		(&BUF->dest)->addr[0] = 0x33;
-		(&BUF->dest)->addr[1] = 0x33;
-		(&BUF->dest)->addr[2] = IPBUF->destipaddr.u8[12];
-		(&BUF->dest)->addr[3] = IPBUF->destipaddr.u8[13];
-		(&BUF->dest)->addr[4] = IPBUF->destipaddr.u8[14];
-		(&BUF->dest)->addr[5] = IPBUF->destipaddr.u8[15];
-	}
-	else {
-		memcpy(&BUF->dest, lladdr, uip_ds6_if.lladdr_len);
-	}
-	memcpy(&BUF->src, &uip_lladdr[ETHERNET_INTERFACE_ID].addr, uip_ds6_if.lladdr_len);
-	BUF->type = UIP_HTONS(UIP_ETHTYPE_IPV6);
-	uip_len += sizeof(struct uip_eth_hdr);
+  uip_arp_out();
 	MAP_EthernetPacketPut(ETH_BASE, uip_buf, uip_len);
 
   return 0;
@@ -115,21 +101,15 @@ void ethernet_exit(void)
 void ethernet_init()
 {
 	uint8_t userReg[8];
-	loadUserRegs(userReg);
-	eth_mac_addr[0] = userReg[0];
-	eth_mac_addr[1] = userReg[1];
-	eth_mac_addr[2] = userReg[2];
-	eth_mac_addr[3] = userReg[4];
-	eth_mac_addr[4] = userReg[5];
-	eth_mac_addr[5] = userReg[6];
+	load_user_regs(userReg);
+	eth_mac_addr.addr[0] = userReg[0];
+	eth_mac_addr.addr[1] = userReg[1];
+	eth_mac_addr.addr[2] = userReg[2];
+	eth_mac_addr.addr[3] = userReg[4];
+	eth_mac_addr.addr[4] = userReg[5];
+	eth_mac_addr.addr[5] = userReg[6];
 
-	//uip_ds6_if[ETHERNET_INTERFACE_ID].lladdr_len = 6;
-	uip_lladdr.addr[0] = eth_mac_addr[0];
-	uip_lladdr.addr[1] = eth_mac_addr[1];
-	uip_lladdr.addr[2] = eth_mac_addr[2];
-	uip_lladdr.addr[3] = eth_mac_addr[3];
-	uip_lladdr.addr[4] = eth_mac_addr[4];
-	uip_lladdr.addr[5] = eth_mac_addr[5];
+  uip_setethaddr(eth_mac_addr);
 
 	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_ETH);
 	MAP_SysCtlPeripheralReset(SYSCTL_PERIPH_ETH);
@@ -147,13 +127,10 @@ void ethernet_init()
    * Enable TX Duplex Mode
    * Enable TX Padding
   */
-	//MAP_EthernetConfigSet(ETH_BASE, (ETH_CFG_TX_DPLXEN | ETH_CFG_TX_PADEN | ETH_CFG_TX_CRCEN | ETH_CFG_RX_AMULEN | ETH_CFG_RX_BADCRCDIS));
 	MAP_EthernetConfigSet(ETH_BASE, (ETH_CFG_TX_DPLXEN | ETH_CFG_TX_PADEN | ETH_CFG_TX_CRCEN | ETH_CFG_RX_AMULEN | ETH_CFG_RX_BADCRCDIS));
-	MAP_EthernetMACAddrSet(ETH_BASE, eth_mac_addr);
+	MAP_EthernetMACAddrSet(ETH_BASE, eth_mac_addr.addr);
 
 	MAP_EthernetEnable(ETH_BASE);
-
-	PRINTF("FALLBACK MAC %x:%x:%x:%x:%x:%x\n",uip_lladdr[ETHERNET_INTERFACE_ID].addr[0],uip_lladdr[ETHERNET_INTERFACE_ID].addr[1],uip_lladdr[ETHERNET_INTERFACE_ID].addr[2],uip_lladdr[ETHERNET_INTERFACE_ID].addr[3],uip_lladdr[ETHERNET_INTERFACE_ID].addr[4],uip_lladdr[ETHERNET_INTERFACE_ID].addr[5]);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -164,31 +141,26 @@ pollhandler(void)
 
   uip_len = MAP_EthernetPacketGetNonBlocking(ETH_BASE, uip_buf, UIP_BUFSIZE);
   if (uip_len > 0) {
-
-		#if UIP_CONF_LLH_LEN == 0
-  		/* Strip header from link local packet and put in ll_header (alias for BUF) */
-			int i;
-			for (i = 0; i < uip_len; i++) {
-				if (i < ETHERNET_LLH_LEN) {
-					ll_header[i] = uip_buf[i];
-				}
-				else {
-					uip_buf[i - ETHERNET_LLH_LEN] = uip_buf[i];
-				}
-			}
-			uip_buf[uip_len - ETHERNET_LLH_LEN] = '\0';
-		#endif
-
-	  PRINTF("ETHERNET receive: %d bytes\n",uip_len);
-		if (BUF->type == uip_htons(UIP_ETHTYPE_IPV6))
-		{
-			//uip_active_interface = ETHERNET_INTERFACE_ID;
-			tcpip_input();
-		}
-		else
-		{
-			uip_len = 0;
-		}
+	  PRINTF("ETHERNET receive: %d bytes\n", uip_len);
+#if UIP_CONF_IPV6
+    if (BUF->type == uip_htons(UIP_ETHTYPE_IPV6)) {
+      uip_neighbor_add(&IPBUF->srcipaddr, &BUF->src);
+      tcpip_input();
+    }
+    else
+#endif /* UIP_CONF_IPV6 */
+    if (BUF->type == uip_htons(UIP_ETHTYPE_IP)) {
+      tcpip_input();
+    }
+    else if (BUF->type == uip_htons(UIP_ETHTYPE_ARP)) {
+      uip_arp_arpin();
+      /* If the above function invocation resulted in data that
+				 should be sent out on the network, the global variable
+				 uip_len is set to a value > 0. */
+      if (uip_len > 0) {
+      	MAP_EthernetPacketPut(ETH_BASE, uip_buf, uip_len);
+      }
+    }
 	}
 }
 
@@ -199,7 +171,9 @@ PROCESS_THREAD(ethernet_process, ev, data)
 
   PROCESS_BEGIN();
 
-  tcpip_set_outputfunc(ETHERNET_INTERFACE_ID, ethernet_output);
+  uip_arp_init();
+
+  tcpip_set_outputfunc(ethernet_output);
 
   process_poll(&ethernet_process);
   

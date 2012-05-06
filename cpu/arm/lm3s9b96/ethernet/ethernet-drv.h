@@ -49,7 +49,9 @@
 
 PROCESS_NAME(ethernet_process);
 
-uint8_t ethernet_output(uip_lladdr_t * lladdr);
+uint8_t ethernet_active(void);
+uint8_t ethernet_output(void);
+//uint8_t ethernet_output(uip_lladdr_t * lladdr);
 void ethernet_exit(void);
 uint8_t * getUserRegisters();
 void ethernet_init(void);

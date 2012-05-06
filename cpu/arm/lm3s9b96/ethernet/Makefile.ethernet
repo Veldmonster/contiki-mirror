@@ -1,2 +1,2 @@
-#CONTIKI_CPU_DIRS           += ethernet
-#CONTIKI_TARGET_SOURCEFILES += ethernet-drv.c
+CONTIKI_CPU_DIRS           += ethernet
+CONTIKI_TARGET_SOURCEFILES += ethernet-drv.c
