@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2010, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,65 +26,25 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the Contiki operating system.
- *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
+ * @(#)$Id: temperature-sensor.h,v 1.1 2010/08/25 19:34:07 nifi Exp $
  */
 
 /**
  * \file
- *         Best-effort single-hop unicast example
+ *         Temperature sensor header file.
  * \author
  *         Adam Dunkels <adam@sics.se>
+ *         Joakim Eriksson <joakime@sics.se>
+ *         Niclas Finne <nfi@sics.se>
  */
 
-#include "contiki.h"
-#include "net/rime.h"
+#ifndef __TEMPERATURE_SENSOR_H__
+#define __TEMPERATURE_SENSOR_H__
 
-#include "dev/button-sensor.h"
+#include "lib/sensors.h"
 
-#include "dev/leds.h"
+extern const struct sensors_sensor temperature_sensor;
 
-#include <stdio.h>
+#define TEMPERATURE_SENSOR "Temperature"
 
-/*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
-{
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
-}
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
-{
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
-  PROCESS_BEGIN();
-
-  unicast_open(&uc, 146, &unicast_callbacks);
-
-  while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
-    }
-
-  }
-
-  PROCESS_END();
-}
-/*---------------------------------------------------------------------------*/
+#endif /* __TEMPERATURE_SENSOR_H__ */

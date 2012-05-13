@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2005, Swedish Institute of Computer Science
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,63 +28,76 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
+ * @(#)$Id: sht11-sensor.c,v 1.2 2010/01/15 08:51:21 adamdunkels Exp $
  */
 
-/**
- * \file
- *         Best-effort single-hop unicast example
- * \author
- *         Adam Dunkels <adam@sics.se>
- */
+#include <stdlib.h>
 
 #include "contiki.h"
-#include "net/rime.h"
+#include "lib/sensors.h"
+#include "dev/sht11.h"
+#include "dev/sht11-sensor.h"
 
-#include "dev/button-sensor.h"
+const struct sensors_sensor sht11_sensor;
 
-#include "dev/leds.h"
-
-#include <stdio.h>
+enum {
+  ON, OFF
+};
+static uint8_t state = OFF;
 
 /*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
+static int
+value(int type)
 {
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
-}
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
-{
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
-  PROCESS_BEGIN();
-
-  unicast_open(&uc, 146, &unicast_callbacks);
-
-  while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
-    }
-
-  }
-
-  PROCESS_END();
+//  switch(type) {
+//    /* Photosynthetically Active Radiation. */
+//  case SHT11_SENSOR_TEMP:
+//    return sht11_temp();;
+//
+//    /* Total Solar Radiation. */
+//  case SHT11_SENSOR_HUMIDITY:
+//    return sht11_humidity();
+//
+//  case SHT11_SENSOR_BATTERY_INDICATOR:
+//    return sht11_sreg() & 0x40? 1: 0;
+//  }
+  return 0;
 }
 /*---------------------------------------------------------------------------*/
+static int
+status(int type)
+{
+//  switch(type) {
+//  case SENSORS_ACTIVE:
+//  case SENSORS_READY:
+//    return (state == ON);
+//  }
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static int
+configure(int type, int c)
+{
+//  switch(type) {
+//  case SENSORS_ACTIVE:
+//    if(c) {
+//      if(!status(SENSORS_ACTIVE)) {
+//        rtimer_clock_t t0;
+//	sht11_init();
+//        state = ON;
+//
+//        /* For for about 11 ms before the SHT11 can be used. */
+//        t0 = RTIMER_NOW();
+//        while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 + RTIMER_SECOND / 100));
+//      }
+//    } else {
+//      sht11_off();
+//      state = OFF;
+//    }
+//  }
+  return 0;
+}
+/*---------------------------------------------------------------------------*/
+SENSORS_SENSOR(sht11_sensor, "sht11",
+	       value, configure, status);

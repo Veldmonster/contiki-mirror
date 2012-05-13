@@ -1,7 +1,7 @@
 CONTIKI = ../..
 
-all: example-abc example-mesh example-collect example-trickle example-polite \
-     example-rudolph0 example-rudolph1 example-rudolph2 example-rucb \
-     example-runicast example-unicast example-neighbors
+all: example-abc.elf example-mesh.elf example-collect.elf example-trickle.elf example-polite.elf \
+     example-rudolph0.elf example-rudolph1.elf example-rudolph2.elf example-rucb.elf \
+     example-runicast.elf example-unicast.elf example-neighbors.elf
 
 include $(CONTIKI)/Makefile.include

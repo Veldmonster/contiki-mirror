@@ -59,3 +59,7 @@ endif
 ifeq ($(TARGET),dk-lm3s9b96)
   shell_src += shell-sky.c shell-exec.c shell-sensortweet.c
 endif
+
+ifeq ($(TARGET),avr-derfmega128)
+  shell_src += shell-sky.c shell-exec.c shell-sensortweet.c
+endif

@@ -72,6 +72,38 @@
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
+			<target name="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/rest-example" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/rest-example" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=dk-lm3s9b96 TOOLCHAIN=cs3</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean TARGET=avr-atmega128rfa1" path="platform/avr-raven" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=avr-atmega128rfa1" path="platform/avr-raven" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
 			<target name="clean TARGET=avr-atmega128rfa1" path="examples/webserver" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
@@ -84,6 +116,22 @@
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
 				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean TARGET=avr-derfmega128" path="examples/rime" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>clean TARGET=avr-derfmega128</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all TARGET=avr-derfmega128" path="examples/rime" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all TARGET=avr-derfmega128</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
@@ -148,20 +196,20 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="clean TARGET=avr-atmega128rfa1" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="clean TARGET=avr-derfmega128" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
-				<buildTarget>clean TARGET=avr-atmega128rfa1</buildTarget>
+				<buildTarget>clean TARGET=avr-derfmega128</buildTarget>
 				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="all TARGET=avr-atmega128rfa1" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="all TARGET=avr-derfmega128" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
-				<buildTarget>all TARGET=avr-atmega128rfa1</buildTarget>
+				<buildTarget>all TARGET=avr-derfmega128</buildTarget>
 				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="clean TARGET=dk-lm3s9b96 TOOLCHAIN=cs3" path="examples/sky-ip" targetID="org.eclipse.cdt.build.MakeTargetBuilder">

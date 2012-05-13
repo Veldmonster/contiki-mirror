@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2006, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,63 +28,46 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
+ * $Id: node-id.c,v 1.1 2007/03/23 09:59:08 nifi Exp $
  */
 
 /**
  * \file
- *         Best-effort single-hop unicast example
+ *         Utility to store a node id in the external flash
  * \author
  *         Adam Dunkels <adam@sics.se>
  */
 
-#include "contiki.h"
-#include "net/rime.h"
+#include "node-id.h"
+//#include "contiki-conf.h"
+//#include "dev/xmem.h"
 
-#include "dev/button-sensor.h"
-
-#include "dev/leds.h"
-
-#include <stdio.h>
+unsigned short node_id = 0;
 
 /*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
+void
+node_id_restore(void)
 {
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
+//  unsigned char buf[4];
+//  xmem_pread(buf, 4, NODE_ID_XMEM_OFFSET);
+//  if(buf[0] == 0xad &&
+//     buf[1] == 0xde) {
+//    node_id = (buf[2] << 8) | buf[3];
+//  } else {
+//    node_id = 0;
+//  }
+	node_id = 212;
 }
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
+void
+node_id_burn(unsigned short id)
 {
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
-  PROCESS_BEGIN();
-
-  unicast_open(&uc, 146, &unicast_callbacks);
-
-  while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
-    }
-
-  }
-
-  PROCESS_END();
+//  unsigned char buf[4];
+//  buf[0] = 0xad;
+//  buf[1] = 0xde;
+//  buf[2] = id >> 8;
+//  buf[3] = id & 0xff;
+//  xmem_erase(XMEM_ERASE_UNIT_SIZE, NODE_ID_XMEM_OFFSET);
+//  xmem_pwrite(buf, 4, NODE_ID_XMEM_OFFSET);
 }
 /*---------------------------------------------------------------------------*/

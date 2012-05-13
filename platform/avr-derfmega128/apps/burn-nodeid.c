@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2006, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,63 +28,54 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
+ * $Id: burn-nodeid.c,v 1.4 2008/02/25 16:34:56 fros4943 Exp $
  */
 
 /**
  * \file
- *         Best-effort single-hop unicast example
+ *         A program for burning a node ID into the flash ROM of a Tmote Sky node.
  * \author
  *         Adam Dunkels <adam@sics.se>
  */
 
-#include "contiki.h"
-#include "net/rime.h"
-
-#include "dev/button-sensor.h"
-
 #include "dev/leds.h"
+#include "dev/watchdog.h"
+#include "node-id.h"
+#include "contiki.h"
+#include "sys/etimer.h"
 
 #include <stdio.h>
 
+static struct etimer etimer;
+
+PROCESS(burn_process, "Burn node id");
+AUTOSTART_PROCESSES(&burn_process);
 /*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
+PROCESS_THREAD(burn_process, ev, data)
 {
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
-}
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
-{
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
   PROCESS_BEGIN();
 
-  unicast_open(&uc, 146, &unicast_callbacks);
+  etimer_set(&etimer, 5*CLOCK_SECOND);
+  PROCESS_WAIT_UNTIL(etimer_expired(&etimer));
 
+  watchdog_stop();
+  leds_on(LEDS_RED);
+#if NODEID
+  printf("Burning node id %d\n", NODEID);
+  node_id_burn(NODEID);
+  leds_on(LEDS_BLUE);
+  node_id_restore();
+  printf("Restored node id %d\n", node_id);
+#else
+#error "burn-nodeid must be compiled with nodeid=<the ID of the node>"
+  node_id_restore();
+  printf("Restored node id %d\n", node_id);
+#endif
+  leds_off(LEDS_RED + LEDS_BLUE);
+  watchdog_start();
   while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
-    }
-
+    PROCESS_WAIT_EVENT();
   }
-
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/

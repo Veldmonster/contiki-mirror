@@ -1,4 +1,4 @@
-all: rest-server-example coap-client-example
+all: rest-server-example.elf coap-client-example.elf
 
 ifndef TARGET
 TARGET=sky
@@ -6,10 +6,10 @@ endif
 
 CONTIKI=../..
 
-WITH_UIP6=1
-UIP_CONF_IPV6=1
+#WITH_UIP6=0
+#UIP_CONF_IPV6=0
 
-WITH_COAP = 1
+WITH_COAP = 0
 
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
 

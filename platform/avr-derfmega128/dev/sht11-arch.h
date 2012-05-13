@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2007, Swedish Institute of Computer Science
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,63 +28,33 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
  */
 
 /**
  * \file
- *         Best-effort single-hop unicast example
+ *	Architecture-specific definitions for the SHT11 sensor on Tmote Sky.
  * \author
- *         Adam Dunkels <adam@sics.se>
+ * 	Niclas Finne <nfi@sics.se>
  */
 
-#include "contiki.h"
-#include "net/rime.h"
+#ifndef SHT11_ARCH_H
+#define SHT11_ARCH_H
 
-#include "dev/button-sensor.h"
+#define SHT11_ARCH_SDA	5	/* P1.5 */
+#define SHT11_ARCH_SCL	6	/* P1.6 */
+#define SHT11_ARCH_PWR	7	/* P1.7 */
 
-#include "dev/leds.h"
+// TODO: Anton
+//#define	SHT11_PxDIR	P1DIR
+//#define SHT11_PxIN	P1IN
+//#define SHT11_PxOUT	P1OUT
+//#define SHT11_PxSEL	P1SEL
 
-#include <stdio.h>
+#define	SHT11_PxDIR	1
+#define SHT11_PxIN	1
+#define SHT11_PxOUT	1
+#define SHT11_PxSEL	1
 
-/*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
-{
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
-}
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
-{
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
-  PROCESS_BEGIN();
 
-  unicast_open(&uc, 146, &unicast_callbacks);
 
-  while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
-    }
-
-  }
-
-  PROCESS_END();
-}
-/*---------------------------------------------------------------------------*/
+#endif

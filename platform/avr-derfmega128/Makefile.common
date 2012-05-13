@@ -1,0 +1,40 @@
+# Contiki port for Dresden Elektroniks - deRFmega128 using deRFtoRCB and Sensor Terminal Board
+# Developed using WinAVR-20100110 with Eclipse on Windows7, 64Bit
+# Debugging and programming of .elf files via AVR Studio 5 and AVR-Dragon
+
+CONTIKI_TARGET_DIRS = . dev apps net
+#ifndef CONTIKI_TARGET_MAIN
+#CONTIKI_TARGET_MAIN = contiki-avr-derfmega128-main.c
+#endif
+CONTIKI_CORE = contiki-avr-derfmega128-main
+CONTIKI_TARGET_MAIN = ${CONTIKI_CORE}.o
+CONTIKI_TARGET_SOURCEFILES += contiki-avr-derfmega128-main.c params.c
+
+CONTIKI_TARGET_SOURCEFILES += rs232.c cfs-eeprom.c eeprom.c random.c params.c node-id.c \
+								sensors.c sky-sensors.c mmem.c \
+								sht11.c sht11-sensor.c
+
+CONTIKIAVR=$(CONTIKI)/cpu/avr
+CONTIKIBOARD=.
+
+CONTIKI_PLAT_DEFS = -DF_CPU=8000000UL -DAUTO_CRC_PADDING=2
+
+MCU=atmega128rfa1
+
+AVRDUDE_PROGRAMMER=jtag2
+
+# For usb devices, you may either use PORT=usb, or (e.g. if you have more than one
+# programmer connected) you can use the following trick to find out the serial number:
+#
+# The example is for an JTAGICE mkII used to program an ATmega128:
+# avrdude -v -P usb:xxxx -c jtag2 -p atmega128
+AVRDUDE_PORT=usb:00B000000D79
+
+
+# Additional avrdude options
+# Verify off
+AVRDUDE_OPTIONS=-V
+
+
+include $(CONTIKIAVR)/Makefile.avr
+include $(CONTIKIAVR)/radio/Makefile.radio

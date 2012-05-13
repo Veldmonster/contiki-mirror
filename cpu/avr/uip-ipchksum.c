@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2011, Universal Concepts CC, South Africa
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,64 +27,68 @@
  * SUCH DAMAGE.
  *
  * This file is part of the Contiki operating system.
- *
- * $Id: example-unicast.c,v 1.5 2010/02/02 16:36:46 adamdunkels Exp $
+ * This port targets the Stellaris ARM, Cortex M3, LM3S9xxxx
+ * which is based on siskin's, multiple-netif branch
+ * for the AVR Zigbit and Microchips ETHERNET.
+ * @(#)$
  */
 
-/**
- * \file
- *         Best-effort single-hop unicast example
- * \author
- *         Adam Dunkels <adam@sics.se>
+/*
+ *  Filename: uip-ipchksum.c
+ *  Created on: 05 May 2012
+ *  Author: Anton Veldhuizen
  */
 
-#include "contiki.h"
-#include "net/rime.h"
+#include "net/uip.h"
 
-#include "dev/button-sensor.h"
-
-#include "dev/leds.h"
-
-#include <stdio.h>
-
+#ifdef UIP_ARCH_IPCHKSUM
 /*---------------------------------------------------------------------------*/
-PROCESS(example_unicast_process, "Example unicast");
-AUTOSTART_PROCESSES(&example_unicast_process);
-/*---------------------------------------------------------------------------*/
-static void
-recv_uc(struct unicast_conn *c, const rimeaddr_t *from)
+uint16_t
+htons(uint16_t val)
 {
-  printf("unicast message received from %d.%d\n",
-	 from->u8[0], from->u8[1]);
+  return UIP_HTONS(val);
 }
-static const struct unicast_callbacks unicast_callbacks = {recv_uc};
-static struct unicast_conn uc;
+
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(example_unicast_process, ev, data)
+static uint16_t
+chksum(uint16_t sum, const uint8_t *data, uint16_t len)
 {
-  PROCESS_EXITHANDLER(unicast_close(&uc);)
-    
-  PROCESS_BEGIN();
+  uint16_t t;
+  const uint8_t *dataptr;
+  const uint8_t *last_byte;
 
-  unicast_open(&uc, 146, &unicast_callbacks);
+  dataptr = data;
+  last_byte = data + len - 1;
 
-  while(1) {
-    static struct etimer et;
-    rimeaddr_t addr;
-    
-    etimer_set(&et, CLOCK_SECOND);
-    
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-
-    packetbuf_copyfrom("Hello", 5);
-    addr.u8[0] = 211;
-    addr.u8[1] = 0;
-    if(!rimeaddr_cmp(&addr, &rimeaddr_node_addr)) {
-      unicast_send(&uc, &addr);
+  while(dataptr < last_byte) {	/* At least two more bytes */
+    t = (dataptr[0] << 8) + dataptr[1];
+    sum += t;
+    if(sum < t) {
+      sum++;		/* carry */
     }
-
+    dataptr += 2;
   }
 
-  PROCESS_END();
+  if(dataptr == last_byte) {
+    t = (dataptr[0] << 8) + 0;
+    sum += t;
+    if(sum < t) {
+      sum++;		/* carry */
+    }
+  }
+
+  /* Return sum in host byte order. */
+  return sum;
 }
 /*---------------------------------------------------------------------------*/
+
+uint16_t
+uip_ipchksum(void)
+{
+  uint16_t sum;
+
+  sum = chksum(0, &uip_buf[UIP_LLH_LEN], UIP_IPH_LEN);
+  return (sum == 0) ? 0xffff : htons(sum);
+}
+/*---------------------------------------------------------------------------*/
+#endif
